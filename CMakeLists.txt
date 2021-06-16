@@ -9,7 +9,8 @@ pico_sdk_init()
 
 add_library(${PROJECT_NAME}
     include/pico_tof.h
-    src/VL53L3CX.c
+    include/vl53lx_register_map.h
+    src/vl53lx.c
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE include)
