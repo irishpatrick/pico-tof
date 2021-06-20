@@ -3,6 +3,8 @@
 #include "pico_tof.h"
 #include "vl53lx_register_map.h"
 
+#include <string.h>
+
 #define I2C_ADDR 0x52
 #define TIMING_GUARD (uint32_t)4528
 #define TARGET_RATE 0x0A00
@@ -308,5 +310,70 @@ int tof_set_timing_budget(ToF* sensor, uint32_t budget_us)
     return 0;
 }
 
+int tof_set_roi_size(ToF* sensor, uint8_t width, uint8_t height)
+{
+    if (width > 16)
+    {
+        width = 16;
+    }
+
+    if (height > 16)
+    {
+        height = 16;
+    }
+
+    if (width > 10 || height > 10)
+    {
+        wr8(sensor, VL53LX_ROI_CONFIG__USER_ROI_CENTRE_SPAD, 199);
+    }
+
+    wr8(sensor, VL53LX_ROI_CONFIG__USER_ROI_REQUESTED_GLOBAL_XY_SIZE, (height - 1) << 4 | (width - 1));
+    return 0;
+}
+
+void tof_set_roi_center(ToF* sensor, uint8_t spad_n)
+{
+    wr8(sensor, VL53LX_ROI_CONFIG__USER_ROI_CENTRE_SPAD, spad_n);
+}
+
+void tof_start_continuous(ToF* sensor, uint32_t period_ms)
+{
+    wr32(sensor, VL53LX_SYSTEM__INTERMEASUREMENT_PERIOD, period_ms * sensor->osc_calibrate_val);
+
+    wr8(sensor, VL53LX_SYSTEM__INTERRUPT_CLEAR, 0x01);
+    wr8(sensor, VL53LX_SYSTEM__MODE_START, 0x80);
+}
+
+void tof_stop_continuous(ToF* sensor)
+{
+    wr8(sensor, VL53LX_SYSTEM__MODE_START, 0x80);
+    sensor->calibrated = false;
+
+    if (sensor->saved_vhv_init != 0)
+    {
+        wr8(sensor, VL53LX_VHV_CONFIG__INIT, sensor->saved_vhv_init);
+    }
+
+    if (sensor->saved_vhv_timeout != 0)
+    {
+        wr8(sensor, VL53LX_PHASECAL_CONFIG__OVERRIDE, 0x00);
+    }
+
+    wr8(sensor, VL53LX_PHASECAL_CONFIG__OVERRIDE, 0x00);
+}
+
+int tof_get_status_string(ToF* sensor, char* dest)
+{
+    switch (sensor->range_data.status)
+    {
+        default:
+            strcpy(dest, "Unknown");
+            break;
+    }
+    return 0;
+}
+
+
 
 #endif
+

@@ -18,7 +18,7 @@ target_compile_options(${PROJECT_NAME} PRIVATE -D${SENSOR})
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 
 # Pull in our pico_stdlib which pulls in commonly used features
-target_link_libraries(${PROJECT_NAME} pico_stdlib hardware_i2c)
+target_link_libraries(${PROJECT_NAME} PRIVATE pico_stdlib hardware_i2c)
 
 if (${BUILD_EXAMPLES})
         add_subdirectory(examples)
