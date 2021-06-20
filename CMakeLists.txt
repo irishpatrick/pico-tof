@@ -13,6 +13,8 @@ add_library(${PROJECT_NAME}
     src/vl53lx.c
 )
 
+target_compile_options(${PROJECT_NAME} PRIVATE -D${SENSOR})
+
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 
 # Pull in our pico_stdlib which pulls in commonly used features

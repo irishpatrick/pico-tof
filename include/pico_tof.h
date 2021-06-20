@@ -9,6 +9,20 @@ typedef enum {SHORT = 0, MEDIUM = 1, LONG = 2} tof_range_t;
 typedef struct _ToF
 {
     i2c_inst_t* bus;
+    uint32_t macro_period_us;
+    uint32_t ts;
+    
+    uint16_t io_timeout;
+    bool did_timeout;
+    uint16_t timeout_start_ms;
+    uint16_t fast_osc_freq;
+    uint16_t osc_calibrate_val;
+    bool calibrated;
+    uint8_t saved_vhv_init;
+    uint8_t saved_vhv_timeout;
+    tof_range_t distance_mode;
+    uint8_t last_status;
+
 } ToF;
 
 int tof_init(ToF*, i2c_inst_t*, uint, uint, uint);
